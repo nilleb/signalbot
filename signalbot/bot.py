@@ -1,17 +1,18 @@
 import asyncio
-from collections import defaultdict
-import time
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
-import traceback
-from typing import Optional, Union, List, Callable
 import re
+import time
+import traceback
+from collections import defaultdict
+from typing import Callable, List, Optional, Union
 
-from .api import SignalAPI, ReceiveMessagesError
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+from .api import ReceiveMessagesError, SignalAPI
 from .command import Command
-from .message import Message, UnknownMessageFormatError
-from .storage import RedisStorage, InMemoryStorage
 from .context import Context
+from .message import Message, UnknownMessageFormatError
+from .storage import InMemoryStorage, RedisStorage
 
 
 class SignalBot:
@@ -237,6 +238,9 @@ class SignalBot:
         logging.info(f"[Bot] {len(self.groups)} groups detected")
 
     def _resolve_receiver(self, receiver: str) -> str:
+        if self._is_uuid(receiver):
+            return receiver
+
         if self._is_phone_number(receiver):
             return receiver
 
@@ -249,6 +253,13 @@ class SignalBot:
 
         except Exception:
             raise SignalBotError(f"Cannot resolve receiver.")
+
+    def _is_uuid(self, uuid: str) -> bool:
+        if uuid is None:
+            return False
+        return re.match(
+            r"^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$", uuid
+        )
 
     def _is_phone_number(self, phone_number: str) -> bool:
         if phone_number is None:

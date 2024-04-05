@@ -1,3 +1,5 @@
+import logging
+
 import aiohttp
 import websockets
 
@@ -50,7 +52,10 @@ class SignalAPI:
         if quote_author:
             payload["quote_author"] = quote_author
         if quote_mentions:
-            payload["quote_mentions"] = quote_mentions
+            logging.warning(
+                "quote_mentions is not implemented because of a 400 in the signal-cli based REST API."
+            )
+            # payload["quote_mentions"] = quote_mentions
         if quote_message:
             payload["quote_message"] = quote_message
         if quote_timestamp:

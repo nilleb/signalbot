@@ -252,7 +252,7 @@ class SignalBot:
             return group_id
 
         except Exception:
-            raise SignalBotError(f"Cannot resolve receiver.")
+            raise SignalBotError(f"Cannot resolve receiver: '{receiver}'.")
 
     def _is_uuid(self, uuid: str) -> bool:
         if uuid is None:

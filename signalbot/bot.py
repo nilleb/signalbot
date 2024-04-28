@@ -333,8 +333,6 @@ class SignalBot:
         logging.info(f"[Bot] Producer #{name} started")
         try:
             async for raw_message in self._signal.receive():
-                logging.info(f"[Raw Message] {raw_message}")
-
                 try:
                     message = Message.parse(raw_message)
                 except UnknownMessageFormatError:

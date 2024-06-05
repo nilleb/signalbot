@@ -248,6 +248,7 @@ class SignalBot:
             return receiver
 
         try:
+            self._detect_groups() # handle the case: the bot has been added to a group after its startup
             group_id = self._groups_by_internal_id[receiver]["id"]
             return group_id
 

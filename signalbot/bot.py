@@ -185,7 +185,7 @@ class SignalBot:
         text_mode: str = None,
         listen: bool = False,
     ) -> int:
-        receiver = self._resolve_receiver(receiver)
+        receiver = await self._resolve_receiver(receiver)
         resp = await self._signal.send(
             receiver,
             text,
@@ -209,18 +209,18 @@ class SignalBot:
     async def react(self, message: Message, emoji: str):
         # TODO: check that emoji is really an emoji
         recipient = message.recipient()
-        recipient = self._resolve_receiver(recipient)
+        recipient = await self._resolve_receiver(recipient)
         target_author = message.source
         timestamp = message.timestamp
         await self._signal.react(recipient, emoji, target_author, timestamp)
         logging.info(f"[Bot] New reaction: {emoji}")
 
     async def start_typing(self, receiver: str):
-        receiver = self._resolve_receiver(receiver)
+        receiver = await self._resolve_receiver(receiver)
         await self._signal.start_typing(receiver)
 
     async def stop_typing(self, receiver: str):
-        receiver = self._resolve_receiver(receiver)
+        receiver = await self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver)
 
     async def _detect_groups(self):
@@ -237,7 +237,7 @@ class SignalBot:
 
         logging.info(f"[Bot] {len(self.groups)} groups detected")
 
-    def _resolve_receiver(self, receiver: str) -> str:
+    async def _resolve_receiver(self, receiver: str) -> str:
         if self._is_uuid(receiver):
             return receiver
 
@@ -248,7 +248,7 @@ class SignalBot:
             return receiver
 
         try:
-            self._detect_groups() # handle the case: the bot has been added to a group after its startup
+            await self._detect_groups() # handle the case: the bot has been added to a group after its startup
             group_id = self._groups_by_internal_id[receiver]["id"]
             return group_id
 
